@@ -325,6 +325,8 @@ GoldenrodGameCornerLeftTheirDrinkScript:
 GoldenrodGameCornerSlotsMachineScript:
 	random 6
 	ifequalfwd 0, GoldenrodGameCornerLuckySlotsMachineScript
+	special Special_CheckLeadItemIsLoadedDice
+	iftruefwd GoldenrodGameCornerLuckySlotsMachineScript
 	reanchormap
 	setval FALSE
 	special Special_SlotMachine

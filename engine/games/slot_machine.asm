@@ -94,13 +94,21 @@ _SlotMachine:
 	ld a, SLOTS_NOMATCH
 	ld [wSlotBias], a
 
+	ld a, [wPartyMon1Item]
+	cp LOADED_DICE
+	jr z, .KeepSevenBias
+
 	xor a
 	ld [wKeepSevenBiasChance], a
 	call Random
 	and %00101010
 	ret nz
+	call .KeepSevenBias
+
+.KeepSevenBias
 	ld a, $1
 	ld [wKeepSevenBiasChance], a
+	ld [wSlotBias], a
 	ret
 
 Slots_GetPals:
@@ -413,6 +421,8 @@ Slots_StopReel1:
 	ret
 
 Slots_StopReel2:
+	ld hl, .Text_DebugStopReel2
+	call PrintText
 	ld a, [wSlotBet]
 	cp $2
 	jr c, .dont_jump
@@ -424,9 +434,16 @@ Slots_StopReel2:
 .skip
 	call .CheckReel1ForASeven
 	jr nz, .dont_jump
+	ld a, [wPartyMon1Item]
+	cp LOADED_DICE
+	jr z, .force_luck
 	call Random
 	cp $50 ; 32%
 	jr nc, .dont_jump
+	ld a, $a
+	ret
+
+.force_luck
 	ld a, $a
 	ret
 
@@ -444,6 +461,16 @@ Slots_StopReel2:
 	ld a, [wReel1Stopped + 2]
 	and a
 	ret
+
+.Text_DebugStopReel2:
+	; stop reel 2
+	text_far _SlotsDebugStopReel2Text
+	text_end
+
+.Text_DebugForceLuck:
+	; force luck 2
+	text_far _SlotsDebugForceLuck2Text
+	text_end
 
 Slots_StopReel3:
 	ld a, [wFirstTwoReelsMatching]
@@ -466,22 +493,49 @@ Slots_StopReel3:
 	ret
 
 .biased
+	ld hl, .Text_DebugStopReel3Biased
+	call PrintText
 	call Random
 	cp 160
-	jr nc, .stop
-	cp 80
 	jr nc, .slow_advance
+	cp 80
+	jr nc, .golem
+
 .golem
+	ld hl, .Text_DebugGolem
+	call PrintText
 	ld a, $12
 	ret
 
 .slow_advance
+	ld hl, .Text_DebugSlowAdvance
+	call PrintText
 	ld a, $10
 	ret
 
 .stop
 	ld a, $9
 	ret
+
+.Text_DebugStopReel3Biased:
+	; stop reel 3 biased
+	text_far _SlotsDebugStopReel3BiasedText
+	text_end
+
+.Text_DebugSlowAdvance:
+	; slow advance
+	text_far _SlotsDebugSlowAdvanceText
+	text_end
+
+.Text_DebugGolem:
+	; golem
+	text_far _SlotsDebugGolemText
+	text_end
+
+.Text_DebugForceLuck3:
+	; force luck 3
+	text_far _SlotsDebugForceLuck3Text
+	text_end
 
 InitReelTiles:
 	ld bc, wReel1
@@ -815,8 +869,7 @@ ReelAction_StopReel3:
 	ret
 
 .NoMatch:
-	ld a, [wSlotBias]
-	cp SLOTS_NOMATCH
+	call .AnalyzeBias
 	jr z, .NoBias
 	ld hl, wReel1Slot09 - wReel1
 	add hl, bc
@@ -828,6 +881,13 @@ ReelAction_StopReel3:
 
 .NoBias:
 	jmp Slots_StopReel
+
+.AnalyzeBias
+	ld a, [wPartyMon1Item]
+	cp LOADED_DICE
+	ret nz
+	ld a, [wSlotBias]
+	cp SLOTS_NOMATCH
 
 ReelAction_SetUpReel2SkipTo7:
 	call Slots_CheckMatchedFirstTwoReels
@@ -904,6 +964,8 @@ ReelAction_InitGolem:
 	xor a
 	ld [wSlotsDelay], a
 ReelAction_WaitGolem:
+	; ld hl, .Text_DebugWaitGolem
+	; call PrintText
 	ld a, [wSlotsDelay]
 	dec a
 	jr z, .one
@@ -921,6 +983,21 @@ ReelAction_WaitGolem:
 	add hl, bc
 	ld [hl], $8
 	ret
+
+.Text_DebugWaitGolem:
+	; wait golem
+	text_far _SlotsDebugWaitGolemText
+	text_end
+
+.Text_DebugWaitGolemOne:
+	; wait golem one
+	text_far _SlotsDebugWaitGolemOneText
+	text_end
+
+.Text_DebugWaitGolemTwo:
+	; wait golem two
+	text_far _SlotsDebugWaitGolemTwoText
+	text_end
 
 ReelAction_EndGolem:
 	xor a
@@ -1084,8 +1161,7 @@ ReelAction_WaitSlowAdvanceReel3:
 	jmp Slots_PlaySFX
 
 .check1
-	ld a, [wSlotBias]
-	and a
+	call .AnalyzeBias
 	jr nz, .check2
 	call Slots_CheckMatchedAllThreeReels
 	jr nc, .play_sfx
@@ -1094,11 +1170,28 @@ ReelAction_WaitSlowAdvanceReel3:
 	call Slots_StopReel
 	jmp WaitSFX
 
+.AnalyzeBias
+	ld a, [wPartyMon1Item]
+	cp LOADED_DICE
+	ret z
+	ld a, [wSlotBias]
+	and a
+
 .check2
 	call Slots_CheckMatchedAllThreeReels
 	jr c, .play_sfx
 	call Slots_StopReel
 	jmp WaitSFX
+
+.Text_DebugSlowAdvanceBiased:
+	; slow advance biased
+	text_far _SlotsDebugSlowAdvanceBiasedText
+	text_end
+
+.Text_DebugSlowAdvanceNoBias:
+	; slow advance bias
+	text_far _SlotsDebugSlowAdvanceNoBiasText
+	text_end
 
 Slots_CheckMatchedFirstTwoReels:
 	xor a
@@ -1306,9 +1399,9 @@ Slots_GetNumberOfGolems:
 	ret
 
 .Check7Bias:
-	ld a, [wSlotBias]
-	and a
-	jr nz, .not_biased_to_seven
+	; call .analyze_bias
+	; jr nz, .not_biased_to_seven
+	call .not_biased_to_seven
 	ld e, a
 .loop1
 	ld hl, wReel1Position - wReel1
@@ -1322,6 +1415,13 @@ Slots_GetNumberOfGolems:
 	and a
 	jr nz, .loop1
 	ret
+
+.analyze_bias
+	ld a, [wPartyMon1Item]
+	cp LOADED_DICE
+	ret z
+	ld a, [wSlotBias]
+	and a
 
 .not_biased_to_seven
 	call Random
@@ -1341,6 +1441,16 @@ Slots_GetNumberOfGolems:
 	pop de
 	jr c, .loop2
 	ret
+
+.Text_DebugCheck7BiasBiased:
+	; check 7 bias true
+	text_far _SlotsDebugCheck7BiasText
+	text_end
+
+.Text_DebugCheck7NotBiased:
+	; check 7 bias false
+	text_far _SlotsDebugCheck7NotBiasedText
+	text_end
 
 Slots_InitBias:
 	ld a, [wSlotBias]
@@ -1376,13 +1486,18 @@ Slots_InitBias:
 	db $ff, SLOTS_NOMATCH  ; everything else
 
 .Lucky:
-	db $02, SLOTS_SEVEN    ;  1/128
+	db $02, SLOTS_SEVEN    ;  1/32
 	db $03, SLOTS_POKEBALL ;  1/256
 	db $08, SLOTS_STARYU   ;  5/256
-	db $10, SLOTS_SQUIRTLE ;  1/32
+	db $10, SLOTS_SQUIRTLE ;  1/128
 	db $1e, SLOTS_PIKACHU  ;  7/128
 	db $50, SLOTS_CHERRY   ; 25/128
 	db $ff, SLOTS_NOMATCH  ; everything else
+
+.Text_DebugLucky:
+	; Lucky!
+	text_far _SlotsDebugLuckyText
+	text_end
 
 Slots_IlluminateBetLights:
 	ld b, $14 ; turned on

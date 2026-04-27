@@ -12,6 +12,7 @@ INCLUDE "engine/events/happiness_egg.asm"
 INCLUDE "engine/events/bills_grandfather.asm"
 INCLUDE "engine/events/hidden_power_guru.asm"
 INCLUDE "engine/events/haircut_etc.asm"
+INCLUDE "engine/events/checkleaditem.asm"
 
 
 SECTION "Special Events", ROMX

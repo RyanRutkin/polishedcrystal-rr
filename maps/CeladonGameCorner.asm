@@ -153,6 +153,8 @@ CeladonGameCornerGrampsScript:
 MapCeladonGameCornerSignpost35Script:
 	random $6
 	ifequalfwd $0, MapCeladonGameCornerSignpost16Script
+	special Special_CheckLeadItemIsLoadedDice
+	iftruefwd MapCeladonGameCornerSignpost16Script
 	reanchormap
 	setval $0
 	special Special_SlotMachine

@@ -3656,10 +3656,81 @@ _MartBoughtText::
 	text "."
 	done
 
+SECTION "_SlotsDebugLuckyText", ROMX
+_SlotsDebugLuckyText::
+	text "Lucky!"
+	done
+
+SECTION "_SlotsDebugForceLuck2Text", ROMX
+_SlotsDebugForceLuck2Text::
+	text "force luck 2"
+	done
+
+SECTION "_SlotsDebugForceLuck3Text", ROMX
+_SlotsDebugForceLuck3Text::
+	text "force luck 3"
+	done
+
+SECTION "_SlotsDebugSlowAdvanceText", ROMX
+_SlotsDebugSlowAdvanceText::
+	text "slow advance"
+	done
+
+SECTION "_SlotsDebugSlowAdvanceBiasedText", ROMX
+_SlotsDebugSlowAdvanceBiasedText::
+	text "slow advance biased"
+	done
+
+SECTION "_SlotsDebugSlowAdvanceNoBiasText", ROMX
+_SlotsDebugSlowAdvanceNoBiasText::
+	text "slow advance not biased"
+	done
+
+SECTION "_SlotsDebugGolemText", ROMX
+_SlotsDebugGolemText::
+	text "golem"
+	done
+
+SECTION "_SlotsDebugCheck7BiasText", ROMX
+_SlotsDebugCheck7BiasText::
+	text "check 7 bias true"
+	done
+
+SECTION "_SlotsDebugCheck7NotBiasedText", ROMX
+_SlotsDebugCheck7NotBiasedText::
+	text "check 7 bias false"
+	done
+
+SECTION "_SlotsDebugWaitGolemText", ROMX
+_SlotsDebugWaitGolemText::
+	text "wait golem"
+	done
+
+SECTION "_SlotsDebugWaitGolemOneText", ROMX
+_SlotsDebugWaitGolemOneText::
+	text "wait golem one"
+	done
+
+SECTION "_SlotsDebugWaitGolemTwoText", ROMX
+_SlotsDebugWaitGolemTwoText::
+	text "wait golem two"
+	done
+
 SECTION "_SlotsBetHowManyCoinsText", ROMX
 _SlotsBetHowManyCoinsText::
 	text "Bet how many"
 	line "coins?"
+	done
+
+SECTION "_SlotsDebugStopReel2Text", ROMX
+_SlotsDebugStopReel2Text::
+	text "stop reel 2"
+	done
+
+SECTION "_SlotsDebugStopReel3BiasedText", ROMX
+_SlotsDebugStopReel3BiasedText::
+	text "stop reel 3"
+	line "biased"
 	done
 
 SECTION "TMMartCostsThisMuchText", ROMX
